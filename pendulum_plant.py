@@ -304,8 +304,8 @@ class PendulumPlant:
             thetastart = [self.c.get_position(session_token)]
             thetaend = x0[0]
             tf0 = 2
-            N0 = 100 # i.e. dt = 0.02
-            print("Going to pos:", thetaend, "in 2 seconds which is subtracted from your tf.")
+            N0 = int(tf0 / dt)
+            print("Going to pos:", thetaend, " and time taken is subtracted from your tf.")
             traj = self.JointTrajectory(thetastart, thetaend, tf0, N0)
             self.c.set_impedance_controller_params(0.25, 0.0015, session_token)
             i = 0
@@ -319,10 +319,10 @@ class PendulumPlant:
                 while time.time() - start_loop < dt:
                     pass
                 meas_dt = time.time() - start_loop
-        
+            print("Desired position reached after: ", meas_time, " seconds.")
             print("Experiment will start from the state: ", [self.c.get_position(session_token), self.c.get_velocity(session_token)])
-            tf = tf - tf0
-            print("Your remaining experimentation time is: ", tf)
+            tf = tf - meas_time
+            print("Your remaining experimentation time is: ", tf, " seconds.")
             
         n = int(tf / dt)
 
