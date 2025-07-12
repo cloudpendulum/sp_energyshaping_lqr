@@ -1,5 +1,5 @@
 # Tutorial 02: Energy Shaping and LQR Control of a Simple Pendulum
 
-Link to student's notebook on Cloud Pendulum Jupyter Hub server (preferred option, allows remote hardware access): [https://tinyurl.com/cp-sp-dynamics-control](https://tinyurl.com/cp-sp-energyshaping-lqr)
+Link to student's notebook on Cloud Pendulum Jupyter Hub server (preferred option, allows remote hardware access): [https://tinyurl.com/cp-sp-energyshaping-lqr](https://tinyurl.com/cp-sp-energyshaping-lqr)
 
 Link to student's notebook on Deepnote (fallback option, does not allow remote hardware access): [https://deepnote.com/workspace/Badia-eb7c9c9e-bc9c-4c7b-9400-3576cec06213/project/Tutorial-LQR-and-Region-of-Atraction-for-the-Simple-Pendulum-334d23b8-79d8-4699-a93a-1e010943dd8d/notebook/tutorialstudent-77c137a484924aefadfc78ebe1d6d11d?utm_source=share-modal&utm_medium=product-shared-content&utm_campaign=notebook&utm_content=334d23b8-79d8-4699-a93a-1e010943dd8d](https://deepnote.com/workspace/Badia-eb7c9c9e-bc9c-4c7b-9400-3576cec06213/project/Tutorial-LQR-and-Region-of-Atraction-for-the-Simple-Pendulum-334d23b8-79d8-4699-a93a-1e010943dd8d/notebook/tutorialstudent-77c137a484924aefadfc78ebe1d6d11d?utm_source=share-modal&utm_medium=product-shared-content&utm_campaign=notebook&utm_content=334d23b8-79d8-4699-a93a-1e010943dd8d)
