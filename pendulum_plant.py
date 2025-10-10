@@ -281,7 +281,7 @@ class PendulumPlant:
         traj = np.array(traj).T
         return traj
 
-    def run_on_hardware(self, tf, dt, controller=None, user_token = None, x0 = None, preparation_time = 0.0):
+    def run_on_hardware(self, tf, dt, controller=None, user_token = None, x0 = None, preparation_time = 0.0, record=False):
 
         import time
         
@@ -293,35 +293,14 @@ class PendulumPlant:
 
         self.c = Client()
         
-
-        session_token, self.live_url = self.c.start_experiment(user_token, "SimplePendulum", tf, preparation_time, True)
+        initial_state = x0.copy()
+        if initial_state is not None:
+            initial_state = initial_state[0:len(initial_state)//2] # Only position part is supported
+            
+        session_token, self.live_url = self.c.start_experiment(
+            user_token, "SimplePendulum", tf, preparation_time = preparation_time, record=record, initial_state=initial_state
+        )
         print("Your session token is:", session_token)
-        
-        if x0 is not None:
-            print("You have specified a desired state to start this experiment, x0: ", x0)
-            print("Note: We will try to reach only the Desired Initial Position approximately. Initial Desired velocity will be ignored!")
-            thetastart = [self.c.get_position(session_token)]
-            thetaend = x0[0]
-            tf0 = 2
-            N0 = int(tf0 / dt)
-            print("Going to pos:", thetaend, " and time taken is subtracted from your tf.")
-            traj = self.JointTrajectory(thetastart, thetaend, tf0, N0)
-            self.c.set_impedance_controller_params(0.25, 0.0015, session_token)
-            i = 0
-            meas_time = 0.0
-            meas_dt = 0.0
-            while meas_time < tf0 and i < N0:
-                start_loop = time.time()
-                meas_time += meas_dt
-                self.c.set_position(traj[i], session_token)
-                i = i + 1
-                while time.time() - start_loop < dt:
-                    pass
-                meas_dt = time.time() - start_loop
-            print("Desired position reached after: ", meas_time, " seconds.")
-            print("Experiment will start from the state: ", [self.c.get_position(session_token), self.c.get_velocity(session_token)])
-            tf = tf - meas_time
-            print("Your remaining experimentation time is: ", tf, " seconds.")
             
         n = int(tf / dt)
 
@@ -387,9 +366,10 @@ class PendulumPlant:
         if user_token is not None:
             print("Your current user token status is: ", self.c.get_user_info(user_token))
         
-        filename = wget.download(download_url,".")
-        self.vod_filepath = f'{Path(filename).stem}.mp4'
-        self.convert_flv_to_mp4(f'{filename}', self.vod_filepath)
+        if record==True:
+            filename = wget.download(download_url,".")
+            self.vod_filepath = f'{Path(filename).stem}.mp4'
+            self.convert_flv_to_mp4(f'{filename}', self.vod_filepath)
         
         self.t_values = meas_time_vec
         self.x_values = np.vstack((meas_pos, meas_vel)).T
