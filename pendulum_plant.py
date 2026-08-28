@@ -289,7 +289,7 @@ class PendulumPlant:
             from cloudpendulumlocal.cloud_pendulum_local import Client
             user_token = ""
         else:
-            from cloudpendulumclient.client import Client
+            from pycloudpendulum import Client
 
         self.c = Client()
         
@@ -298,7 +298,12 @@ class PendulumPlant:
             initial_state = initial_state[0:len(initial_state)//2] # Only position part is supported
             
         session_token, self.live_url = self.c.start_experiment(
-            user_token, "SimplePendulum", tf, preparation_time = preparation_time, record=record, initial_state=initial_state
+            user_token = user_token,
+            experiment_type = "SimplePendulum",
+            experiment_time = tf,
+            preparation_time = preparation_time,
+            record = record,
+            initial_position = initial_state,
         )
         print("Your session token is:", session_token)
             
@@ -317,7 +322,7 @@ class PendulumPlant:
 
         print("Control Loop Started!")
             
-        self.c.set_impedance_controller_params(0.0, 0.0, session_token)
+        self.c.set_impedance_controller_params([0.0], [0.0], session_token)
 
         # Control loop
         while meas_time < tf and i < n:
@@ -325,25 +330,25 @@ class PendulumPlant:
             meas_time += meas_dt
             
             ## Do your stuff here - START
-            measured_position = self.c.get_position(session_token)
-            measured_velocity = self.c.get_velocity(session_token)
-            measured_torque = self.c.get_torque(session_token)
+            measured_position = self.c.get_position(session_token)[0]
+            measured_velocity = self.c.get_velocity(session_token)[0]
+            measured_torque = self.c.get_torque(session_token)[0]
             
             self.x = np.array([measured_position, measured_velocity])
             
             # Control logic
             if controller is not None:
-                tau = controller.get_control_output(self.x)
-                self.c.set_torque(tau, session_token)
+                tau = float(controller.get_control_output(self.x))
+                self.c.set_torque([tau], session_token)
             else:
                 tau = 0                
                        
             # Collect data for plotting
             meas_time_vec[i] = meas_time
             meas_pos[i] = measured_position
-            meas_vel[i] = measured_velocity    
+            meas_vel[i] = measured_velocity 
             meas_tau[i] = measured_torque
-            des_tau[i] = tau 
+            des_tau[i] = tau
                 
             ## Do your stuff here - END
             
@@ -367,6 +372,7 @@ class PendulumPlant:
             print("Your current user token status is: ", self.c.get_user_info(user_token))
         
         if record==True:
+            time.sleep(4.0)
             filename = wget.download(download_url,".")
             self.vod_filepath = f'{Path(filename).stem}.mp4'
             self.convert_flv_to_mp4(f'{filename}', self.vod_filepath)
@@ -385,6 +391,7 @@ class PendulumPlant:
         :param input_path: Path to the input FLV file.
         :param output_path: Path to the output MP4 file.
         """
+        time.sleep(2.0)
         command = [
             "ffmpeg",
             "-i", input_path,    # Input file
